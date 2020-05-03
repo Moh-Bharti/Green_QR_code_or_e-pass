@@ -24,3 +24,5 @@ Information going into the pass:
  Confidentiality, authentication,integrity and non-repudiation is relevant.
  
  Concerns are to ensure that the Ids are not forged as a person can use another person QR id. For this watermark is considered to be used.
+
+QR code is verified using Image analysis module or some other modules by uploading it manually on the web site.
