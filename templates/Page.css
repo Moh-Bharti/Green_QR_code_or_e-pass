@@ -1,0 +1,14 @@
+body{
+background-color : powerblue;
+
+}
+h1{
+color:maroon
+}
+p{
+color:red
+}
+p{
+    border: 1px solid powerblue;
+    padding: 30px;
+}
