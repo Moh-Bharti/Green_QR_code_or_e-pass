@@ -9,15 +9,6 @@ QR = Flask(__name__)
 
 QR.config['UPLOAD_FOLDER'] = 'F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database'
 
-Database = list()
-
-Database.append(HealthCard('Negative',000,'Amit',24,'Male','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr'))
-Database.append(HealthCard('Negative',111,'Abhishek',22,'Male','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr1'))
-Database.append(HealthCard('Negative',222,'Shirin',25,'Female','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr2'))
-Database.append(HealthCard('Negative',333,'Naomi',22,'Female','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr3'))
-Database.append(HealthCard('Negative',444,'Shraddha',27,'Female','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr4'))
-Database.append(HealthCard('Negative',555,'Scott',26,'Male','F:/Semester_08/Network Security/Lab_Assignment_05/Green_QR_code_or_e-pass/Database/myqr5'))
-
 
 @QR.route('/')
 def upload():
@@ -33,18 +24,24 @@ def hello():
 
         res=check(QR.config['UPLOAD_FOLDER']+'/'+filename)
         if res.Status == 'Positive':
+            res.Id = str(res.Id)
+            res.Age = str(res.Age)
             return render_template('Positive.html')
 
         elif res.Status == 'Negative':
-            return render_template('Negative.html')
+            res.Id = str(res.Id)
+            res.Age = str(res.Age)
+            return render_template('Negative.html',result= res)
         else:
+            res.Id = str(res.Id)
+            res.Age = str(res.Age)
             return render_template('Suspected.html')
         #return redirect(url_for('upload',filename=filename))
 
     return render_template('Homepage.html')
 
 def check(filename):
-    data = Database
+    data = Database.copy()
 
     uploaded = cv2.imread(filename)
 
