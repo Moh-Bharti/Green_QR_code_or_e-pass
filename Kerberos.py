@@ -7,7 +7,7 @@ from flask_login import LoginManager
 from flask_login import login_required
 from cryptography.fernet import Fernet
 from des import DesKey
-
+import binascii
 
 key_suite = Fernet(Fernet.generate_key())
 
@@ -38,8 +38,7 @@ Lab.secret_key = b'Moh_Abhishek_247_006'
 
 #login_manager = LoginManager()
 #login_manager.init_app(Lab)
-S1 = "Hello"
-Cipher = key_suite.encrypt(S1.encode())
+
 
 @Lab.route('/Lab', methods=['GET','POST'])
 def login():
@@ -49,27 +48,30 @@ def login():
         Pass = hashlib.md5(str(request.form['password']).encode())
         word = Pass.digest()
 
-
         key = DesKey(word)
 
         req = key.encrypt(user.encode(), padding=True)
 
-        redirect(url_for('ticket',token=req))
+        ticket(req)
+        file = open("Code.txt","r+")
+
+        Cipher = file.read()
+
         #print(tick, 'hi',file=sys.stdout)
-        global Cipher
-        print(key_suite.decrypt(Cipher),file=sys.stdout)
-        return redirect(url_for('suc',card=Cipher))
+        file.close()
+
+        return redirect(url_for('suc',card=Cipher.encode('utf-8')))
 
 
 
 
     return render_template('Lab_login.html',error=error)
 
-@Lab.route('/authenticate/<token>')
+
 def ticket(token):
 
-    user_info = Labs.keys()
-    pass_info = Labs.values()
+    user_info = list(Labs.keys())
+    pass_info = list(Labs.values())
 
     S = ""
     for i in range(len(user_info)):
@@ -82,25 +84,28 @@ def ticket(token):
 
             S = S+"Give the access"
 
-    global Cipher
+
     if S == "Give the access":
         ciphertext = key_suite.encrypt(S.encode())
+        file = open("Code.txt","w")
+        file.write(ciphertext.decode('utf-8'))
+        file.close()
 
-        Cipher = ciphertext
 
     else:
         S = "Don't give the access"
         ciphertext = key_suite.encrypt(S.encode())
-
-        Cipher = ciphertext
-
+        file = open("Code.txt", "w")
+        file.write(ciphertext.decode('utf-8'))
+        file.close()
 
 @Lab.route('/success/<card>', methods=['GET', 'POST'])
 
 def suc(card):
-    dec_card = key_suite.decrypt(card)
-    if dec_card == "Give the access":
-        if request.method == 'POST':
+    
+    dec_card = key_suite.decrypt(bytes(card,'utf-8'))
+    if request.method == 'POST':
+        if dec_card == ("Give the access").encode():
             Id = request.form['Id']
             status = request.form['status']
             a = -1
@@ -113,8 +118,8 @@ def suc(card):
 
                 Database[a].Status = status
                 return "Updated Successfully"
-    else:
-        return "Wrong Id"
+        else:
+            return "Wrong Id"
 
     return render_template('Update.html', error=None)
 
