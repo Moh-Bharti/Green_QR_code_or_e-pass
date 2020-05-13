@@ -1,13 +1,11 @@
 from flask import *
-# from werkzeug.utils import secure_filename
+
 import os
 import hashlib
 import sys
-from flask_login import LoginManager
-from flask_login import login_required
 from cryptography.fernet import Fernet
 from des import DesKey
-import binascii
+import pandas
 
 key_suite = Fernet(Fernet.generate_key())
 
@@ -100,17 +98,21 @@ def update():
         Id = request.form['Id']
         status = request.form['status']
         a = -1
+        Database = pandas.read_csv('Details.csv')
+        print(Database,file=sys.stdout)
         for i in range(len(Database)):
 
-            if Database[i].Id == int(Id):
+            if Database["Id"][i] == int(Id):
                 a += i + 1
 
         if a >= 0:
-            Database[a].Status = status
+            Database["Status"][a] = status
+            Database.to_csv('Details.csv')
             return "Updated Successfully"
         else:
             return "Wrong Credentials"
     return render_template('Update.html', error=None)
+
 
 if __name__ == '__main__':
 
